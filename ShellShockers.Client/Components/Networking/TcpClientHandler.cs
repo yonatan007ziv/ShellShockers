@@ -1,8 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
+using OpenTK.Compute.OpenCL;
 using ShellShockers.Core.Utilities.Exceptions.Encryption;
 using ShellShockers.Core.Utilities.Exceptions.Networking;
 using ShellShockers.Core.Utilities.Interfaces;
 using ShellShockers.Core.Utilities.Networking;
+using ShellShockers.Core.Utilities.Networking.CommunicationProtocols;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -23,7 +25,7 @@ internal class TcpClientHandler : BaseTcpHandler
 	{
 		try
 		{
-			await client.ConnectAsync(address, port);
+			await Socket.ConnectAsync(address, port);
 			await InitializeEncryption();
 			return true;
 		}
@@ -31,7 +33,7 @@ internal class TcpClientHandler : BaseTcpHandler
 		return false;
 	}
 
-	public async new Task WriteMessage<T>(T message) where T : class
+	public async new Task WriteMessage<T>(MessagePacket<T> message) where T : class
 	{
 		try
 		{
@@ -40,9 +42,9 @@ internal class TcpClientHandler : BaseTcpHandler
 		catch (NetworkedException) { Disconnect(); }
 	}
 
-	public async new Task<T> ReadMessage<T>() where T : class
+	public async new Task<MessagePacket<T>> ReadMessage<T>() where T : class
 	{
-		T result;
+		MessagePacket<T> result;
 		try
 		{
 			result = await base.ReadMessage<T>();
@@ -95,7 +97,7 @@ internal class TcpClientHandler : BaseTcpHandler
 
 	public void Disconnect()
 	{
-		client.Close();
+		Socket.Close();
 		disconnectedCts.Cancel();
 	}
 }

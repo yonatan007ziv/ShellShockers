@@ -3,6 +3,8 @@ using GameEngine.Core.SharedServices.Interfaces;
 using ShellShockers.Client.Components.Networking;
 using ShellShockers.Client.GameComponents.UIComponents.LoginRegister;
 using ShellShockers.Client.GameComponents.UIComponents.Views.Base;
+using ShellShockers.Core.Utilities.Networking.CommunicationProtocols;
+using ShellShockers.Core.Utilities.Networking.CommunicationProtocols.Models;
 using System.Net;
 
 namespace ShellShockers.Client.GameComponents.UIComponents.Views;
@@ -28,7 +30,7 @@ internal class LoginViewControl : BaseView
 		uiObjects.Add(usernameLabel);
 
 		// Username text box
-		usernameTextBox = new UITextBox("TextBox");
+		usernameTextBox = new UITextBox("TextBox.mat");
 		usernameTextBox.Transform.Scale /= 5;
 		usernameTextBox.Transform.Position = new System.Numerics.Vector3(0.5f, 0.75f, 5f);
 		uiObjects.Add(usernameTextBox);
@@ -41,13 +43,13 @@ internal class LoginViewControl : BaseView
 		uiObjects.Add(passwordLabel);
 
 		// Password text box
-		passwordTextBox = new UITextBox("TextBox");
+		passwordTextBox = new UITextBox("TextBox.mat");
 		passwordTextBox.Transform.Scale /= 5;
 		passwordTextBox.Transform.Position = new System.Numerics.Vector3(0.5f, 0.25f, 5f);
 		uiObjects.Add(passwordTextBox);
 
 		// Login button
-		loginButton = new LoginButton(LoginProcedure);
+		loginButton = new LoginButton();
 		loginButton.Transform.Scale /= 5;
 		loginButton.Transform.Position = new System.Numerics.Vector3(0.5f, -0.25f, 5f);
 		uiObjects.Add(loginButton);
@@ -58,10 +60,20 @@ internal class LoginViewControl : BaseView
 		loginResultLabel.Transform.Position = new System.Numerics.Vector3(0.5f, -0.5f, 5f);
 		uiObjects.Add(loginResultLabel);
 
+		// Button clicked
+		loginButton.OnFullClicked += OnLoginButtonClicked;
+
 		this.clientFactory = clientFactory;
 	}
 
-	private async void LoginProcedure()
+	private async void OnLoginButtonClicked()
+	{
+		loginButton.Enabled = false;
+		await LoginProcedure();
+		loginButton.Enabled = true;
+	}
+
+	private async Task LoginProcedure()
 	{
 		if (!clientFactory.Create(out TcpClientHandler clientHandler))
 		{
@@ -70,14 +82,14 @@ internal class LoginViewControl : BaseView
 			return;
 		}
 
-		if (usernameTextBox.TextData.Text.Length == 0)
+		if (usernameTextBox.Text.Length == 0)
 		{
 			loginResultLabel.Text = "Invalid username";
 			Console.WriteLine(loginResultLabel.Text);
 			return;
 		}
 
-		if (passwordTextBox.TextData.Text.Length == 0)
+		if (passwordTextBox.Text.Length == 0)
 		{
 			loginResultLabel.Text = "Invalid password";
 			Console.WriteLine(loginResultLabel.Text);
@@ -90,5 +102,11 @@ internal class LoginViewControl : BaseView
 			Console.WriteLine(loginResultLabel.Text);
 			return;
 		}
+
+		await clientHandler.WriteMessage<LoginRequestModel>(new MessagePacket<LoginRequestModel>(MessageType.LoginRequest, new LoginRequestModel() { Username = usernameTextBox.Text, Password = passwordTextBox.Text }));
+		MessagePacket<LoginResponseModel> response = await clientHandler.ReadMessage<LoginResponseModel>();
+
+		// Disconnect at the end of the request: temp
+		clientHandler.Disconnect();
 	}
 }

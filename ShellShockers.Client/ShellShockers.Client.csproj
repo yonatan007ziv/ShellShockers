@@ -9,67 +9,41 @@
 
   <ItemGroup>
     <Compile Remove="GameEngineSrc\**" />
+    <Compile Remove="Resources\Materials\Colors\**" />
+    <Compile Remove="Resources\Materials\UI\**" />
+    <Compile Remove="Resources\Textures\Colors\**" />
+    <Compile Remove="Resources\Textures\UI\**" />
     <EmbeddedResource Remove="GameEngineSrc\**" />
+    <EmbeddedResource Remove="Resources\Materials\Colors\**" />
+    <EmbeddedResource Remove="Resources\Materials\UI\**" />
+    <EmbeddedResource Remove="Resources\Textures\Colors\**" />
+    <EmbeddedResource Remove="Resources\Textures\UI\**" />
     <None Remove="GameEngineSrc\**" />
+    <None Remove="Resources\Materials\Colors\**" />
+    <None Remove="Resources\Materials\UI\**" />
+    <None Remove="Resources\Textures\Colors\**" />
+    <None Remove="Resources\Textures\UI\**" />
   </ItemGroup>
 
   <ItemGroup>
     <None Remove="Resources\Fonts\Arial.ttf" />
     <None Remove="Resources\Fonts\ToThePointRegular.ttf" />
-    <None Remove="Resources\Materials\Colors\Blue.mat" />
-    <None Remove="Resources\Materials\Colors\Green.mat" />
-    <None Remove="Resources\Materials\Colors\Red.mat" />
-    <None Remove="Resources\Materials\Default.mat" />
     <None Remove="Resources\Materials\Ground.mat" />
-    <None Remove="Resources\Materials\MissingTexture.mat" />
     <None Remove="Resources\Materials\Trex.mat" />
     <None Remove="Resources\Materials\Wall.mat" />
     <None Remove="Resources\Materials\WhiteGrayBorder.mat" />
-    <None Remove="Resources\Models\Plane.obj" />
     <None Remove="Resources\Models\PlayerEgg.obj" />
-    <None Remove="Resources\Models\UIPlane.obj" />
-    <None Remove="Resources\Shaders\GLSL\DefaultFragment.glsl" />
-    <None Remove="Resources\Shaders\GLSL\DefaultVertex.glsl" />
-    <None Remove="Resources\Shaders\GLSL\GizmosFragment.glsl" />
-    <None Remove="Resources\Shaders\GLSL\GizmosVertex.glsl" />
-    <None Remove="Resources\Shaders\GLSL\LightTexturedFragment.glsl" />
-    <None Remove="Resources\Shaders\GLSL\LightTexturedVertex.glsl" />
-    <None Remove="Resources\Shaders\GLSL\TexturedFragment.glsl" />
-    <None Remove="Resources\Shaders\GLSL\TexturedVertex.glsl" />
     <None Remove="Resources\Textures\Cityscape.png" />
-    <None Remove="Resources\Textures\Colors\Black.png" />
-    <None Remove="Resources\Textures\Colors\Blue.png" />
-    <None Remove="Resources\Textures\Colors\Green.png" />
-    <None Remove="Resources\Textures\Colors\Red.png" />
     <None Remove="Resources\Textures\Dirt.png" />
     <None Remove="Resources\Textures\MissingTexture.png" />
     <None Remove="Resources\Textures\Trex.png" />
-    <None Remove="Resources\Textures\UI\TextBox.png" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Resources\Fonts\Arial.ttf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="Resources\Fonts\ToThePointRegular.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\Materials\Colors\Blue.mat">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Materials\Colors\Green.mat">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Materials\Colors\Red.mat">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Materials\Default.mat">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="Resources\Materials\Ground.mat">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Materials\MissingTexture.mat">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Materials\Trex.mat">
@@ -78,67 +52,16 @@
     <Content Include="Resources\Materials\Wall.mat">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\Materials\UI\TextBox.mat">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Models\Plane.obj">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="Resources\Models\PlayerEgg.obj">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Models\UIPlane.obj">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Shaders\GLSL\DefaultFragment.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Shaders\GLSL\DefaultVertex.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Shaders\GLSL\GizmosFragment.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Shaders\GLSL\GizmosVertex.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Shaders\GLSL\LightTexturedFragment.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Shaders\GLSL\LightTexturedVertex.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Shaders\GLSL\TexturedFragment.glsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Shaders\GLSL\TexturedVertex.glsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Textures\Cityscape.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\Textures\Colors\Black.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Textures\Colors\Blue.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Textures\Colors\Green.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Textures\Colors\Red.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="Resources\Textures\Dirt.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\Textures\MissingTexture.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="Resources\Textures\Trex.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Textures\UI\TextBox.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -148,7 +71,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="YonatanZ.GameEngine" Version="1.4.1" />
+    <PackageReference Include="YonatanZ.GameEngine" Version="1.4.5" />
   </ItemGroup>
 
   <ItemGroup>
