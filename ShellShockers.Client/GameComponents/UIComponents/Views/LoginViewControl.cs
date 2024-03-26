@@ -103,10 +103,48 @@ internal class LoginViewControl : BaseView
 			return;
 		}
 
-		await clientHandler.WriteMessage<LoginRequestModel>(new MessagePacket<LoginRequestModel>(MessageType.LoginRequest, new LoginRequestModel() { Username = usernameTextBox.Text, Password = passwordTextBox.Text }));
-		MessagePacket<LoginResponseModel> response = await clientHandler.ReadMessage<LoginResponseModel>();
+		// Write login request to server 
+		MessagePacket<LoginRegisterRequestModel> loginRequestPacket = new MessagePacket<LoginRegisterRequestModel>(MessageType.LoginRequest, new LoginRegisterRequestModel() { Username = usernameTextBox.Text, Password = passwordTextBox.Text });
+		await clientHandler.WriteMessage<LoginRegisterRequestModel>(loginRequestPacket);
 
-		// Disconnect at the end of the request: temp
+		// Read login response from server
+		MessagePacket<LoginRegisterResponseModel> response = await clientHandler.ReadMessage<LoginRegisterResponseModel>();
+
+		if (response.Type == MessageType.Invalid)
+			return;
+
+		if (response.Type == MessageType.LoginReponse)
+		{
+			switch (response.Payload!.Status)
+			{
+				case Core.Utilities.Networking.CommunicationProtocols.Enums.LoginRegisterResponse.None:
+					loginResultLabel.Text = "Critical: response - None";
+					Console.WriteLine(loginResultLabel.Text);
+					break;
+				case Core.Utilities.Networking.CommunicationProtocols.Enums.LoginRegisterResponse.Success:
+					loginResultLabel.Text = "Error connecting to server";
+					Console.WriteLine(loginResultLabel.Text);
+					break;
+				case Core.Utilities.Networking.CommunicationProtocols.Enums.LoginRegisterResponse.UnknownError:
+					loginResultLabel.Text = "Unknown error occurred";
+					Console.WriteLine(loginResultLabel.Text);
+					break;
+				case Core.Utilities.Networking.CommunicationProtocols.Enums.LoginRegisterResponse.UsernameDoesNotExist:
+					loginResultLabel.Text = "Username does not exist";
+					Console.WriteLine(loginResultLabel.Text);
+					break;
+				case Core.Utilities.Networking.CommunicationProtocols.Enums.LoginRegisterResponse.WrongPassword:
+					loginResultLabel.Text = "Wrong password";
+					Console.WriteLine(loginResultLabel.Text);
+					break;
+				case Core.Utilities.Networking.CommunicationProtocols.Enums.LoginRegisterResponse.EmailNotConfirmed:
+					loginResultLabel.Text = "Email not confirmed";
+					Console.WriteLine(loginResultLabel.Text);
+					break;
+			}
+		}
+
+		// Disconnect at the end of the request
 		clientHandler.Disconnect();
 	}
 }

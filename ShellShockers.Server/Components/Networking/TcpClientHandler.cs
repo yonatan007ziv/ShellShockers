@@ -31,14 +31,13 @@ internal class TcpClientHandler : BaseTcpHandler
 
 	public async new Task<MessagePacket<T>> ReadMessage<T>() where T : class
 	{
-		MessagePacket<T> result;
 		try
 		{
-			result = await base.ReadMessage<T>();
+			return await base.ReadMessage<T>();
 		}
-		catch (NetworkedException) { Disconnect(); throw; }
+		catch (NetworkedException) { Disconnect(); }
 
-		return result;
+		return new MessagePacket<T>(MessageType.Invalid, default);
 	}
 
 	protected override async Task<bool> EstablishEncryption()

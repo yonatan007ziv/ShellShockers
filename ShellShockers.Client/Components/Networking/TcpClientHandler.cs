@@ -1,10 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
-using OpenTK.Compute.OpenCL;
 using ShellShockers.Core.Utilities.Exceptions.Encryption;
-using ShellShockers.Core.Utilities.Exceptions.Networking;
 using ShellShockers.Core.Utilities.Interfaces;
 using ShellShockers.Core.Utilities.Networking;
 using ShellShockers.Core.Utilities.Networking.CommunicationProtocols;
+using ShellShockers.Core.Utilities.Networking.CommunicationProtocols.Models;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -14,6 +13,8 @@ namespace ShellShockers.Client.Components.Networking;
 internal class TcpClientHandler : BaseTcpHandler
 {
 	private readonly ILogger logger;
+
+	private string AuthenticationToken { get; set; } = "";
 
 	public TcpClientHandler(TcpClient client, ISerializer messageSerializer, ILogger logger)
 		: base(client, messageSerializer, logger)
@@ -39,19 +40,18 @@ internal class TcpClientHandler : BaseTcpHandler
 		{
 			await base.WriteMessage(message);
 		}
-		catch (NetworkedException) { Disconnect(); }
+		catch (Exception ex) { logger.LogCritical("Unhandled write exception: {exMessage}", ex.Message); }
 	}
+
 
 	public async new Task<MessagePacket<T>> ReadMessage<T>() where T : class
 	{
-		MessagePacket<T> result;
 		try
 		{
-			result = await base.ReadMessage<T>();
+			return await base.ReadMessage<T>();
 		}
-		catch (NetworkedException) { Disconnect(); throw; }
-
-		return result;
+		catch (Exception ex) { logger.LogCritical("Unhandled read exception: {exMessage}", ex.Message); }
+		return new MessagePacket<T>(MessageType.Invalid, default);
 	}
 
 	protected override async Task<bool> EstablishEncryption()
@@ -95,8 +95,9 @@ internal class TcpClientHandler : BaseTcpHandler
 		return true;
 	}
 
-	public void Disconnect()
+	public async void Disconnect()
 	{
+		await WriteMessage(new MessagePacket<DisconnectModel>(MessageType.Disconnect, new DisconnectModel()));
 		Socket.Close();
 		disconnectedCts.Cancel();
 	}

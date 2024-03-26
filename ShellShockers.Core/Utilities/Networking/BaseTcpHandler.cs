@@ -37,8 +37,8 @@ public abstract class BaseTcpHandler
 		this.messageSerializer = messageSerializer;
 		this.logger = logger;
 
-		writeTimeout = TimeSpan.FromSeconds(15);
-		readTimeout = TimeSpan.FromSeconds(15);
+		writeTimeout = TimeSpan.FromSeconds(5);
+		readTimeout = TimeSpan.FromSeconds(10);
 
 		encryptionHandler = new EncryptionHandler();
 
@@ -64,12 +64,12 @@ public abstract class BaseTcpHandler
 		try
 		{
 			// Serializes the payload
-			string serializedPayload = messageSerializer.Serialize(message.Payload)
-				?? throw new SerializationException(message.Payload.ToString());
+			string serializedPayload = messageSerializer.Serialize(message.Payload!)
+				?? throw new SerializationException(message.Payload!.ToString());
 
 			// Constructs a string representation of the Type and Payload of the message
 			string encodedMessage = $"{(int)message.Type}:{serializedPayload}";
-			
+
 			// Get bytes from the representation
 			byte[] decryptedWriteBuffer = Encoding.UTF8.GetBytes(encodedMessage);
 
@@ -87,10 +87,10 @@ public abstract class BaseTcpHandler
 		catch (ObjectDisposedException ex) { logger.LogError($"Disposed Exception: {ex.Message}"); exceptionType = NetworkedExceptionType.Disposed; }
 		catch (TimeoutException ex) { logger.LogError($"Timeout Exception: {ex.Message}"); exceptionType = NetworkedExceptionType.Timedout; }
 		catch (OperationCanceledException ex) { logger.LogError($"Operation Cancelled Exception: {ex.Message}"); exceptionType = NetworkedExceptionType.OperationCancelled; }
-		catch (Exception ex) { logger.LogCritical($"MISHANDLED EXCEPTION: {ex.Message}"); throw new Exception("MISHANDLED EXCEPTION"); }
+		catch (Exception ex) { logger.LogCritical("MISHANDLED EXCEPTION: {exceptionMessage}", ex.Message); throw new Exception("UNHANDLED EXCEPTION"); }
 
 		disconnectedCts.Cancel();
-		throw new NetworkedException(exceptionType);
+		logger.LogError("Error writing message of type: {type}, Error: {errorCode}", typeof(T).Name, exceptionType.ToString());
 	}
 	public async Task<MessagePacket<T>> ReadMessage<T>() where T : class
 	{
@@ -127,10 +127,11 @@ public abstract class BaseTcpHandler
 		catch (SerializationException ex) { logger.LogError($"Deserialization Exception: {ex.Message}"); exceptionType = NetworkedExceptionType.DeserializationFailed; }
 		catch (ObjectDisposedException ex) { logger.LogError($"Disposed Exception: {ex.Message}"); exceptionType = NetworkedExceptionType.Disposed; }
 		catch (FormatException ex) { logger.LogError($"Format exception: {ex.Message}"); exceptionType = NetworkedExceptionType.DeserializationFailed; }
-		catch (Exception ex) { logger.LogCritical($"MISHANDLED EXCEPTION: {ex.Message}"); throw new Exception("MISHANDLED EXCEPTION"); }
+		catch (Exception ex) { logger.LogCritical("MISHANDLED EXCEPTION: {exceptionMessage}", ex.Message); throw new Exception("UNHANDLED EXCEPTION"); }
 
 		disconnectedCts.Cancel();
-		throw new NetworkedException(exceptionType);
+		logger.LogError("Error reading message of type: {type}, Error: {errorCode}", typeof(T).Name, exceptionType.ToString());
+		return new MessagePacket<T>(MessageType.Invalid, default);
 	}
 	#endregion
 
