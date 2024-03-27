@@ -25,6 +25,6 @@ internal static class EmailSender
 			smtpClient.Send(Email, email, subject, body);
 			return true;
 		}
-		catch (Exception ex) { return false; }
+		catch { return false; }
 	}
 }

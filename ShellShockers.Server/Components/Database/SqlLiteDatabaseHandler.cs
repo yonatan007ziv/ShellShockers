@@ -39,7 +39,7 @@ internal static class SqlLiteDatabaseHandler
 
 	public static string GetSaltedPasswordHash(string username)
 	{
-		string sql = @"SELECT SaltedPasswordHash FROM [Users] WHERE Username = @Username";
+		string sql = @"SELECT PasswordHash FROM [Users] WHERE Username = @Username";
 
 		SqliteCommand cmd = conn.CreateCommand();
 		cmd.CommandText = sql;
@@ -84,7 +84,7 @@ internal static class SqlLiteDatabaseHandler
 
 	public static void InsertUser(string username, string email, string saltedPasswordHash, string passwordSalt)
 	{
-		string sql = @"INSERT INTO [Users] (Username,PasswordHash, PasswordSalt, Email, EmailConfirmed) VALUES (@Username, @SaltedPasswordHash, @PasswordSalt, @Email, 0)";
+		string sql = @"INSERT INTO [Users] (Username, PasswordHash, PasswordSalt, Email, EmailConfirmed) VALUES (@Username, @SaltedPasswordHash, @PasswordSalt, @Email, 0)";
 
 		SqliteCommand cmd = conn.CreateCommand();
 		cmd.CommandText = sql;
