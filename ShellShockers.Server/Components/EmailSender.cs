@@ -6,7 +6,7 @@ namespace ShellShockers.Server.Components;
 internal static class EmailSender
 {
 	private const string Email = "yonatan005ziv@gmail.com";
-	private const string Password = "dtey faoq abon ndmr";
+	private const string Password = "gzyu fokf xawm gaum";
 
 	private static readonly SmtpClient smtpClient = new SmtpClient("smtp.gmail.com");
 

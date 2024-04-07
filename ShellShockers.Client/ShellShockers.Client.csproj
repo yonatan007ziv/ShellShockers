@@ -9,19 +9,13 @@
 
   <ItemGroup>
     <Compile Remove="GameEngineSrc\**" />
-    <Compile Remove="Resources\Materials\Colors\**" />
     <Compile Remove="Resources\Materials\UI\**" />
-    <Compile Remove="Resources\Textures\Colors\**" />
     <Compile Remove="Resources\Textures\UI\**" />
     <EmbeddedResource Remove="GameEngineSrc\**" />
-    <EmbeddedResource Remove="Resources\Materials\Colors\**" />
     <EmbeddedResource Remove="Resources\Materials\UI\**" />
-    <EmbeddedResource Remove="Resources\Textures\Colors\**" />
     <EmbeddedResource Remove="Resources\Textures\UI\**" />
     <None Remove="GameEngineSrc\**" />
-    <None Remove="Resources\Materials\Colors\**" />
     <None Remove="Resources\Materials\UI\**" />
-    <None Remove="Resources\Textures\Colors\**" />
     <None Remove="Resources\Textures\UI\**" />
   </ItemGroup>
 
@@ -29,13 +23,24 @@
     <None Remove="Resources\Fonts\Arial.ttf" />
     <None Remove="Resources\Fonts\ToThePointRegular.ttf" />
     <None Remove="Resources\Materials\Ground.mat" />
+    <None Remove="Resources\Materials\TextBox.mat" />
     <None Remove="Resources\Materials\Trex.mat" />
     <None Remove="Resources\Materials\Wall.mat" />
     <None Remove="Resources\Materials\WhiteGrayBorder.mat" />
+    <None Remove="Resources\Models\Pistol.obj" />
     <None Remove="Resources\Models\PlayerEgg.obj" />
+    <None Remove="Resources\Models\PlayerEggHand.obj" />
+    <None Remove="Resources\Models\PlayerEggShadow.obj" />
+    <None Remove="Resources\Models\Rifle.obj" />
+    <None Remove="Resources\Models\Sniper.obj" />
     <None Remove="Resources\Textures\Cityscape.png" />
+    <None Remove="Resources\Textures\Colors\Black.png" />
+    <None Remove="Resources\Textures\Colors\Blue.png" />
+    <None Remove="Resources\Textures\Colors\Green.png" />
+    <None Remove="Resources\Textures\Colors\Red.png" />
     <None Remove="Resources\Textures\Dirt.png" />
     <None Remove="Resources\Textures\MissingTexture.png" />
+    <None Remove="Resources\Textures\TextBox.png" />
     <None Remove="Resources\Textures\Trex.png" />
   </ItemGroup>
 
@@ -46,19 +51,52 @@
     <Content Include="Resources\Materials\Ground.mat">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Resources\Materials\TextBox.mat">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\Materials\Trex.mat">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Materials\Wall.mat">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Resources\Models\PlayerEggHand.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Models\Rifle.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Models\Pistol.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\Models\PlayerEgg.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Models\PlayerEggShadow.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Models\Sniper.obj">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Textures\Cityscape.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Resources\Textures\Colors\Black.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Textures\Colors\Blue.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Textures\Colors\Green.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Textures\Colors\Red.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\Textures\Dirt.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Textures\TextBox.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Textures\Trex.png">
@@ -71,11 +109,71 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="YonatanZ.GameEngine" Version="1.5.1" />
+    <PackageReference Include="YonatanZ.GameEngine" Version="1.7.11" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ShellShockers.Core\ShellShockers.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="C:\Users\yonat\.nuget\packages\yonatanz.gameengine\1.6.4\contentFiles\any\net8.0\EngineResources\Fonts\Arial.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="C:\Users\yonat\.nuget\packages\yonatanz.gameengine\1.6.4\contentFiles\any\net8.0\EngineResources\Fonts\LoveDays.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="C:\Users\yonat\.nuget\packages\yonatanz.gameengine\1.6.4\contentFiles\any\net8.0\EngineResources\Materials\Default.mat">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="C:\Users\yonat\.nuget\packages\yonatanz.gameengine\1.6.4\contentFiles\any\net8.0\EngineResources\Materials\MissingTexture.mat">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="C:\Users\yonat\.nuget\packages\yonatanz.gameengine\1.6.4\contentFiles\any\net8.0\EngineResources\Models\Cube.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="C:\Users\yonat\.nuget\packages\yonatanz.gameengine\1.6.4\contentFiles\any\net8.0\EngineResources\Models\Plane.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="C:\Users\yonat\.nuget\packages\yonatanz.gameengine\1.6.4\contentFiles\any\net8.0\EngineResources\Models\Pyramid.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="C:\Users\yonat\.nuget\packages\yonatanz.gameengine\1.6.4\contentFiles\any\net8.0\EngineResources\Models\UIRect.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="C:\Users\yonat\.nuget\packages\yonatanz.gameengine\1.6.4\contentFiles\any\net8.0\EngineResources\Shaders\GLSL\DefaultFragment.glsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="C:\Users\yonat\.nuget\packages\yonatanz.gameengine\1.6.4\contentFiles\any\net8.0\EngineResources\Shaders\GLSL\DefaultVertex.glsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="C:\Users\yonat\.nuget\packages\yonatanz.gameengine\1.6.4\contentFiles\any\net8.0\EngineResources\Shaders\GLSL\GizmosFragment.glsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="C:\Users\yonat\.nuget\packages\yonatanz.gameengine\1.6.4\contentFiles\any\net8.0\EngineResources\Shaders\GLSL\GizmosVertex.glsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="C:\Users\yonat\.nuget\packages\yonatanz.gameengine\1.6.4\contentFiles\any\net8.0\EngineResources\Shaders\GLSL\LightTexturedFragment.glsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="C:\Users\yonat\.nuget\packages\yonatanz.gameengine\1.6.4\contentFiles\any\net8.0\EngineResources\Shaders\GLSL\LightTexturedVertex.glsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="C:\Users\yonat\.nuget\packages\yonatanz.gameengine\1.6.4\contentFiles\any\net8.0\EngineResources\Shaders\GLSL\TextFragment.glsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="C:\Users\yonat\.nuget\packages\yonatanz.gameengine\1.6.4\contentFiles\any\net8.0\EngineResources\Shaders\GLSL\TexturedFragment.glsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="C:\Users\yonat\.nuget\packages\yonatanz.gameengine\1.6.4\contentFiles\any\net8.0\EngineResources\Shaders\GLSL\TexturedVertex.glsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="C:\Users\yonat\.nuget\packages\yonatanz.gameengine\1.6.4\contentFiles\any\net8.0\EngineResources\Shaders\GLSL\TextVertex.glsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="C:\Users\yonat\.nuget\packages\yonatanz.gameengine\1.6.4\contentFiles\any\net8.0\EngineResources\Textures\MissingTexture.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

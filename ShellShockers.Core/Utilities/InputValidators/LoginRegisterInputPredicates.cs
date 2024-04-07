@@ -9,7 +9,7 @@ public static class LoginRegisterInputPredicates
 
 	public static bool PasswordValid(string password)
 	{
-		return password.Length > 3;
+		return password.Length > 3 && password.All(c => c <= 127);
 	}
 
 	public static bool EmailValid(string email)

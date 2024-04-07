@@ -3,7 +3,7 @@ using GameEngine.Core.Components.Objects;
 
 namespace ShellShockers.Client.GameComponents.WorldComponents.Controllers;
 
-internal class PlayerUIController : ScriptableWorldComponent
+internal class PlayerUIController : ScriptableWorldObject
 {
 	public PlayerUIController(WorldObject parent)
 		: base(parent)

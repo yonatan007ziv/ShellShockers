@@ -16,7 +16,8 @@ internal class Program
 
 		GameEngine.LogRenderingLogs = false;
 
-		new LoginRegisterScene().LoadScene();
+		new ShootingScene().LoadScene();
+		//new LoginRegisterScene().LoadScene();
 
 		GameEngine.Run();
 	}

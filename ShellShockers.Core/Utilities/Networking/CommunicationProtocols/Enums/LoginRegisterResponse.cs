@@ -18,5 +18,12 @@ public enum LoginRegisterResponse
 	InvalidEmail,
 	EmailInUse,
 	TwoFactorAuthenticationSent,
+
+	// Forgot password responses
+	EmailDoesNotExist,
+
+	// Two FA
 	Wrong2FACode,
+	TwoFACodeExpired,
+
 }

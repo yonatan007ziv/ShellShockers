@@ -1,9 +1,67 @@
-﻿namespace ShellShockers.Server.Components.Networking.ClientHandlers;
+﻿using ShellShockers.Core.Utilities.Models;
+using ShellShockers.Core.Utilities.Networking.CommunicationProtocols;
+using ShellShockers.Core.Utilities.Networking.CommunicationProtocols.Models;
+using ShellShockers.Server.Components.Lobby;
+
+namespace ShellShockers.Server.Components.Networking.ClientHandlers;
 
 internal class GameplayClientHandler : BaseClientHandler
 {
-	public override void StartRead()
+	private LobbyHandler? joinedLobby;
+
+	public override async void StartRead()
 	{
-		throw new NotImplementedException();
+		OnDisconnect += NotifyLobbyDisconnected;
+
+		while (Connected)
+		{
+			MessagePacket<GameplayRequestModel> message = await TcpClientHandler.ReadMessage<GameplayRequestModel>();
+
+			if (!Connected)
+				return;
+
+			if (message.Type == MessageType.Disconnect || message.Type == MessageType.Invalid || message.Type == MessageType.None)
+			{
+				Disconnect();
+				return;
+			}
+
+			if (joinedLobby is not null)
+				await joinedLobby.InterpretMessage(message); // Authenticated client
+			else
+				InterpretMessage(message);
+		}
+	}
+
+	private void NotifyLobbyDisconnected()
+	{
+		joinedLobby?.RemovePlayer(this);
+	}
+
+	public void InterpretMessage(MessagePacket<GameplayRequestModel> message)
+	{
+		if (!ClientAuthenticator.CheckAuthenticationToken(message.Payload!.AuthenticationToken))
+			return;
+
+		GameplayRequestModel requestModel = message.Payload!;
+		if (message.Type == MessageType.LobbiesFetchRequest)
+			LobbiesFetchRequest();
+		else if (message.Type == MessageType.JoinLobbyRequest)
+			JoinLobbyRequest(message.Payload.JoinLobbyId);
+	}
+
+	private void LobbiesFetchRequest()
+	{
+		LobbyModel[] lobbies = LobbyManager.GetLobbyModels();
+		GameplayResponseModel responseModel = new GameplayResponseModel() { LobbiesListArray = lobbies };
+		MessagePacket<GameplayResponseModel> message = new MessagePacket<GameplayResponseModel>(MessageType.LobbiesFetchReponse, responseModel);
+		_ = TcpClientHandler.WriteMessage(message);
+	}
+
+	private async void JoinLobbyRequest(int lobbyId)
+	{
+		MessagePacket<GameplayResponseModel> message = new MessagePacket<GameplayResponseModel>(MessageType.JoinLobbyResponse, new GameplayResponseModel());
+		message.Payload!.SuccessJoiningLobby = LobbyManager.AddPlayerToLobby(this, lobbyId);
+		await TcpClientHandler.WriteMessage(message);
 	}
 }

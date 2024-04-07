@@ -2,7 +2,6 @@
 
 internal abstract class BaseClientHandler
 {
-
 	public TcpClientHandler TcpClientHandler { get; set; } = null!;
 	public bool Connected { get; set; }
 	public event Action? OnDisconnect;

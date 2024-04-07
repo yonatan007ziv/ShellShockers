@@ -3,51 +3,44 @@ using System.Text;
 
 namespace ShellShockers.Server.Components;
 
-internal static class PasswordHasherSalter
+internal static class HasherSalter
 {
 	private static readonly MD5 hasher = MD5.Create();
 	private static readonly Random random = new Random();
 	private static readonly int saltLength;
 
-	static PasswordHasherSalter()
+	static HasherSalter()
 	{
 		saltLength = hasher.HashSize;
 	}
 
-	public static string RandomSalt()
+	public static byte[] RandomSalt()
 	{
 		const string valid = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
 		StringBuilder res = new StringBuilder();
+
 		for (int i = 0; i < saltLength; i++)
 			res.Append(valid[random.Next(valid.Length)]);
-		return res.ToString();
+
+		return Encoding.ASCII.GetBytes(res.ToString());
 	}
 
-	public static string HashPassword(string password)
+	public static byte[] HashArray(byte[] arr)
 	{
-		byte[] bytes = Encoding.UTF8.GetBytes(password);
-		byte[] hash = hasher.ComputeHash(bytes);
-		return Encoding.UTF8.GetString(hash);
+		return hasher.ComputeHash(arr);
 	}
 
-	public static string SaltHash(string hash, string salt)
+	public static byte[] SaltHash(byte[] hash, byte[] salt)
 	{
-		HashAlgorithm algorithm = SHA256Managed.Create();
+		HashAlgorithm algorithm = SHA256.Create();
 
-		byte[] hashBytes = Encoding.UTF8.GetBytes(hash);
-		byte[] saltBytes = Encoding.UTF8.GetBytes(salt);
+		byte[] hashWithSaltBytes = new byte[hash.Length + salt.Length];
 
-		byte[] hashWithSaltBytes = new byte[hashBytes.Length + saltBytes.Length];
+		for (int i = 0; i < hash.Length; i++)
+			hashWithSaltBytes[i] = hash[i];
+		for (int i = 0; i < salt.Length; i++)
+			hashWithSaltBytes[hash.Length + i] = salt[i];
 
-		for (int i = 0; i < hashBytes.Length; i++)
-		{
-			hashWithSaltBytes[i] = hashBytes[i];
-		}
-		for (int i = 0; i < saltBytes.Length; i++)
-		{
-			hashWithSaltBytes[hashBytes.Length + i] = saltBytes[i];
-		}
-
-		return Encoding.UTF8.GetString(algorithm.ComputeHash(hashWithSaltBytes));
+		return algorithm.ComputeHash(hashWithSaltBytes);
 	}
 }

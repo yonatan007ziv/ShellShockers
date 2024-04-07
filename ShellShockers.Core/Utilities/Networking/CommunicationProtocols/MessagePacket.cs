@@ -2,12 +2,12 @@
 
 public class MessagePacket<T> where T : class
 {
-	public MessageType Type{ get; set; }
+	public MessageType Type { get; set; }
 	public T? Payload { get; set; }
 
-    public MessagePacket(MessageType type, T? payload)
-    {
-        Type = type;
-        Payload = payload;
-    }
+	public MessagePacket(MessageType type, T? payload = null)
+	{
+		Type = type;
+		Payload = payload;
+	}
 }

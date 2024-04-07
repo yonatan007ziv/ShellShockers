@@ -12,6 +12,8 @@ internal class TcpServer<TClientHandler> where TClientHandler : BaseClientHandle
 	private readonly TcpListener listener;
 	private readonly Dictionary<TcpClientHandler, BaseClientHandler> clients = new Dictionary<TcpClientHandler, BaseClientHandler>();
 
+	private readonly TimeSpan DDosFreezeTime = TimeSpan.FromMinutes(1);
+
 	public bool Run { get; set; }
 	public ObservableCollection<TcpClientHandler> Clients { get; }
 
@@ -76,11 +78,25 @@ internal class TcpServer<TClientHandler> where TClientHandler : BaseClientHandle
 		while (Run)
 		{
 			TcpClient tcpSocket = await listener.AcceptTcpClientAsync();
-
-			// TODO: DDoS and DoS blocker
-
 			TcpClientHandler tcpClientHandler = new TcpClientHandler(tcpSocket, new JsonSerializer(), new ConsoleLogger());
-			Clients.Add(tcpClientHandler);
+
+			if (!DDoSChecker.CheckHealthy())
+				await FreezeServerForTime();
+
+			if (DoSChecker.CheckHealthy(tcpClientHandler))
+				Clients.Add(tcpClientHandler);
+		}
+	}
+
+	private async Task FreezeServerForTime()
+	{
+		await Task.Delay(DDosFreezeTime);
+
+		// Ignore all buffered requests
+		while (listener.Pending())
+		{
+			TcpClient ignoredClient = await listener.AcceptTcpClientAsync();
+			ignoredClient.Close();
 		}
 	}
 
@@ -88,14 +104,14 @@ internal class TcpServer<TClientHandler> where TClientHandler : BaseClientHandle
 	{
 		while (Run)
 		{
-			await Console.Out.WriteLineAsync("Polling connections...");
-
 			for (int i = 0; i < Clients.Count; i++)
 				if (Clients[i].Socket.Client.Poll(1, SelectMode.SelectRead) && !Clients[i].Socket.GetStream().DataAvailable)
-				{
-					Clients[i].Disconnect();
-					Clients.RemoveAt(i--);
-				}
+					try
+					{
+						Clients[i].Disconnect();
+						Clients.RemoveAt(i--);
+					}
+					catch { }
 
 			await Task.Delay(1000);
 		}

@@ -91,13 +91,13 @@ internal class TcpClientHandler : BaseTcpHandler
 			return false;
 		}
 
-		logger.LogInformation("Encryption Successful");
+		logger.LogInformation("End-to-end encryption was Successful");
 		return true;
 	}
 
 	public async void Disconnect()
 	{
-		await WriteMessage(new MessagePacket<DisconnectModel>(MessageType.Disconnect, new DisconnectModel()));
+		await WriteMessage(new MessagePacket<EmptyMessageModel>(MessageType.Disconnect, new EmptyMessageModel()));
 		Socket.Close();
 		disconnectedCts.Cancel();
 	}

@@ -12,7 +12,6 @@ namespace ShellShockers.Server.Components.Networking;
 internal class TcpClientHandler : BaseTcpHandler
 {
 	private readonly ILogger logger;
-
 	public TcpClientHandler(TcpClient client, ISerializer messageSerializer, ILogger logger)
 		: base(client, messageSerializer, logger)
 	{
@@ -77,12 +76,13 @@ internal class TcpClientHandler : BaseTcpHandler
 			return false;
 		}
 
-		logger.LogInformation("Encryption Successful");
+		logger.LogInformation("End-to-end encryption was Successful");
 		return true;
 	}
 
 	public void Disconnect()
 	{
+		Disconnected();
 		Socket.Close();
 		disconnectedCts.Cancel();
 	}

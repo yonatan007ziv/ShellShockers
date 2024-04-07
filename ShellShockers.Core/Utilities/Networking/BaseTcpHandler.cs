@@ -31,6 +31,8 @@ public abstract class BaseTcpHandler
 	protected CancellationTokenSource disconnectedCts;
 	protected TaskCompletionSource encryptionTask;
 
+	public event Action? OnDisconnected;
+
 	public BaseTcpHandler(TcpClient client, ISerializer messageSerializer, ILogger logger)
 	{
 		this.Socket = client;
@@ -112,8 +114,8 @@ public abstract class BaseTcpHandler
 			MessageType type = (MessageType)typeNumber;
 
 			// Desrialized the payload
-			T deserialized = messageSerializer.Deserialize<T>(messageParts[1])
-				?? throw new SerializationException(messageParts[1]);
+			T? deserialized = messageSerializer.Deserialize<T>(messageParts[1])
+				?? null;
 
 			return new MessagePacket<T>(type, deserialized);
 		}
@@ -195,6 +197,9 @@ public abstract class BaseTcpHandler
 		return readBufer;
 	}
 	#endregion
+
+	public void Disconnected()
+		=> OnDisconnected?.Invoke();
 
 	public void Dispose()
 	{

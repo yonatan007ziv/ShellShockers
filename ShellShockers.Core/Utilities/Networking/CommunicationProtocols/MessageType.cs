@@ -9,6 +9,12 @@ public enum MessageType
 
 	// Client server login register
 	LoginRequest, LoginReponse,
-	RegisterRequest, RegisterReponse, TwoFACode
+	RegisterRequest, RegisterReponse,
+	TwoFARequest, TwoFAResponse,
+	ForgotPasswordRequest, ForgotPasswordReponse,
 
+	DoSResponse,
+
+	LobbiesFetchRequest, LobbiesFetchReponse,
+	JoinLobbyRequest, JoinLobbyResponse,
 }

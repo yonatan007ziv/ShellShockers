@@ -8,5 +8,5 @@ public class LoginRegisterRequestModel
 
 	// Register fields
 	public string Email { get; set; } = default!;
-	public string TwoFAToken { get; set; } = default!;
+	public string TwoFACode { get; set; } = default!;
 }

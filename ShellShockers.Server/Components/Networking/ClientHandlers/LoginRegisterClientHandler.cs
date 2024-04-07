@@ -3,13 +3,12 @@ using ShellShockers.Core.Utilities.Networking.CommunicationProtocols;
 using ShellShockers.Core.Utilities.Networking.CommunicationProtocols.Enums;
 using ShellShockers.Core.Utilities.Networking.CommunicationProtocols.Models;
 using ShellShockers.Server.Components.Database;
+using System.Text;
 
 namespace ShellShockers.Server.Components.Networking.ClientHandlers;
 
 internal class LoginRegisterClientHandler : BaseClientHandler
 {
-	private string stored2FA;
-
 	public override async void StartRead()
 	{
 		while (Connected)
@@ -28,7 +27,7 @@ internal class LoginRegisterClientHandler : BaseClientHandler
 			await InterpretMessage(message);
 		}
 	}
-	
+
 	public async Task InterpretMessage(MessagePacket<LoginRegisterRequestModel> message)
 	{
 		LoginRegisterRequestModel requestModel = message.Payload!;
@@ -36,8 +35,10 @@ internal class LoginRegisterClientHandler : BaseClientHandler
 			await LoginRequest(requestModel);
 		else if (message.Type == MessageType.RegisterRequest)
 			await RegisterRequest(requestModel);
-		else if (message.Type == MessageType.TwoFACode)
-			await TwoFARegisterRequest(requestModel);
+		else if (message.Type == MessageType.TwoFARequest)
+			await TwoFARequest(requestModel);
+		else if (message.Type == MessageType.ForgotPasswordRequest)
+			await ForgotPasswordRequestRequest(requestModel);
 	}
 
 	private async Task LoginRequest(LoginRegisterRequestModel requestModel)
@@ -49,14 +50,21 @@ internal class LoginRegisterClientHandler : BaseClientHandler
 
 		if (!SqlLiteDatabaseHandler.UsernameExists(requestModel.Username))
 			responseModel.Status = LoginRegisterResponse.UsernameDoesNotExist;
-		else if (!SqlLiteDatabaseHandler.CheckPassword(requestModel.Username, requestModel.Password))
+		else if (!SqlLiteDatabaseHandler.CheckPassword(requestModel.Username, Encoding.ASCII.GetBytes(requestModel.Password)))
 			responseModel.Status = LoginRegisterResponse.WrongPassword;
 		else if (!SqlLiteDatabaseHandler.GetEmailConfirmed(requestModel.Username))
+		{
 			responseModel.Status = LoginRegisterResponse.EmailNotConfirmed;
+			Send2FA(SqlLiteDatabaseHandler.GetEmail(requestModel.Username), requestModel.Username);
+		}
 		else
+		{
 			responseModel.Status = LoginRegisterResponse.Success;
+			responseModel.AuthenticationToken = ClientAuthenticator.GenerateAuthenticationToken();
 
-		Console.WriteLine(responseModel.Status.ToString());
+			ClientAuthenticator.AddAuthenticationKey(responseModel.AuthenticationToken, requestModel.Username);
+		}
+
 		await TcpClientHandler.WriteMessage(responsePacket);
 	}
 
@@ -65,10 +73,9 @@ internal class LoginRegisterClientHandler : BaseClientHandler
 		await Console.Out.WriteLineAsync($"Register request: {requestModel.Username} {requestModel.Password} {requestModel.Email}");
 
 		LoginRegisterResponseModel responseModel = new LoginRegisterResponseModel();
-		MessagePacket<LoginRegisterResponseModel> responsePacket = new MessagePacket<LoginRegisterResponseModel>(MessageType.LoginReponse, responseModel);
+		MessagePacket<LoginRegisterResponseModel> responsePacket = new MessagePacket<LoginRegisterResponseModel>(MessageType.RegisterReponse, responseModel);
 
 		string twoFAToken = TwoFactorAuthenticationCodeGenerator.Generate2FACode();
-
 		if (SqlLiteDatabaseHandler.UsernameExists(requestModel.Username))
 			responseModel.Status = LoginRegisterResponse.UsernameExists;
 		else if (!LoginRegisterInputPredicates.UsernameValid(requestModel.Username))
@@ -79,34 +86,42 @@ internal class LoginRegisterClientHandler : BaseClientHandler
 			responseModel.Status = LoginRegisterResponse.InvalidEmail;
 		else if (SqlLiteDatabaseHandler.EmailExists(requestModel.Email))
 			responseModel.Status = LoginRegisterResponse.EmailInUse;
-		else if (!EmailSender.SendEmail(requestModel.Email, "2FA Token", $"Your 2FA token is: {twoFAToken}"))
+		else if (!Send2FA(requestModel.Email, requestModel.Username))
 			responseModel.Status = LoginRegisterResponse.InvalidEmail;
 		else
 			responseModel.Status = LoginRegisterResponse.TwoFactorAuthenticationSent;
 
-		Console.WriteLine(responseModel.Status.ToString());
-
-		stored2FA = twoFAToken;
-
+		// Send password reset key to email
 		if (responseModel.Status == LoginRegisterResponse.TwoFactorAuthenticationSent)
 		{
+			byte[] passwordBytes = Encoding.ASCII.GetBytes(requestModel.Password);
+			byte[] hashedPasswordArray = HasherSalter.HashArray(passwordBytes);
+
+			byte[] salt = HasherSalter.RandomSalt();
+			byte[] saltedHash = HasherSalter.SaltHash(hashedPasswordArray, salt);
+
 			// Insert user without confirming the email
-			string salt = PasswordHasherSalter.RandomSalt();
-			string saltedHash = PasswordHasherSalter.SaltHash(requestModel.Password, salt);
-			SqlLiteDatabaseHandler.InsertUser(requestModel.Username, requestModel.Email, saltedHash, salt);
+			SqlLiteDatabaseHandler.InsertUser(requestModel.Username, requestModel.Email, saltedHash, salt, HasherSalter.HashArray(Encoding.UTF8.GetBytes(twoFAToken)));
 		}
 
 		await TcpClientHandler.WriteMessage(responsePacket);
 	}
 
-	private async Task TwoFARegisterRequest(LoginRegisterRequestModel requestModel)
+	private async Task TwoFARequest(LoginRegisterRequestModel requestModel)
 	{
-		await Console.Out.WriteLineAsync($"2FA Request: {requestModel.Username} {requestModel.TwoFAToken}");
+		await Console.Out.WriteLineAsync($"2FA request: {requestModel.Username} {requestModel.TwoFACode}");
 
 		LoginRegisterResponseModel responseModel = new LoginRegisterResponseModel();
-		MessagePacket<LoginRegisterResponseModel> responsePacket = new MessagePacket<LoginRegisterResponseModel>(MessageType.RegisterReponse, responseModel);
+		MessagePacket<LoginRegisterResponseModel> responsePacket = new MessagePacket<LoginRegisterResponseModel>(MessageType.TwoFAResponse, responseModel);
 
-		if (requestModel.TwoFAToken == stored2FA)
+
+		if (!SqlLiteDatabaseHandler.UsernameExists(requestModel.Username))
+			responseModel.Status = LoginRegisterResponse.InvalidUsername;
+		else if (!SqlLiteDatabaseHandler.Get2FATime(requestModel.Username, out DateTime twoFASentTime))
+			responseModel.Status = LoginRegisterResponse.UnknownError;
+		else if (DateTime.Now.Subtract(twoFASentTime) > TimeSpan.FromMinutes(5))
+			responseModel.Status = LoginRegisterResponse.TwoFACodeExpired;
+		else if (CheckAgainstStored2FA(requestModel.Username, requestModel.TwoFACode))
 		{
 			SqlLiteDatabaseHandler.ValidateEmail(requestModel.Username);
 			responseModel.Status = LoginRegisterResponse.Success;
@@ -117,5 +132,39 @@ internal class LoginRegisterClientHandler : BaseClientHandler
 		Console.WriteLine(responseModel.Status.ToString());
 
 		await TcpClientHandler.WriteMessage(responsePacket);
+	}
+
+	private bool CheckAgainstStored2FA(string username, string twoFACode)
+	{
+		byte[] stored2FAHash = SqlLiteDatabaseHandler.Get2FAHash(username);
+
+		byte[] twoFABytes = Encoding.UTF8.GetBytes(twoFACode);
+		byte[] twoFAHash = HasherSalter.HashArray(twoFABytes);
+
+		if (twoFAHash.Length != stored2FAHash.Length)
+			return false;
+		for (int i = 0; i < twoFAHash.Length; i++)
+			if (stored2FAHash[i] != twoFAHash[i])
+				return false;
+
+		return true;
+	}
+
+	private async Task ForgotPasswordRequestRequest(LoginRegisterRequestModel requestModel)
+	{
+		await Console.Out.WriteLineAsync($"Forgot password request: {requestModel.Email} {requestModel.TwoFACode}");
+
+		LoginRegisterResponseModel responseModel = new LoginRegisterResponseModel();
+		MessagePacket<LoginRegisterResponseModel> responsePacket = new MessagePacket<LoginRegisterResponseModel>(MessageType.ForgotPasswordReponse, responseModel);
+
+		await TcpClientHandler.WriteMessage(responsePacket);
+	}
+
+	private bool Send2FA(string email, string username)
+	{
+		string twoFAToken = TwoFactorAuthenticationCodeGenerator.Generate2FACode();
+		SqlLiteDatabaseHandler.Set2FATime(username, DateTime.Now);
+		SqlLiteDatabaseHandler.Set2FAHash(username, HasherSalter.HashArray(Encoding.UTF8.GetBytes(twoFAToken)));
+		return EmailSender.SendEmail(email, "2FA Token", $"Your 2FA token is: {twoFAToken}");
 	}
 }
