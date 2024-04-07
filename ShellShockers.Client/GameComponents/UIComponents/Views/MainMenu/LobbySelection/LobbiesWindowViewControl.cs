@@ -26,7 +26,7 @@ internal class LobbiesWindowViewControl : UIObject
 			|| !await clientHandler.Connect(IPAddress.Parse(ServerAddresses.GameplayServerAddress), ServerAddresses.GameplayServerPort))
 			return;
 
-		await clientHandler.WriteMessage(new MessagePacket<GameplayRequestModel>(MessageType.LobbiesFetchRequest, new GameplayRequestModel(AuthenticationTokenHolder.AuthenticationToken)));
+		await clientHandler.WriteMessage(new MessagePacket<GameplayRequestModel>(MessageType.LobbiesFetchRequest, new GameplayRequestModel(SessionHolder.AuthenticationToken)));
 		GameplayResponseModel? responseModel = (await clientHandler.ReadMessage<GameplayResponseModel>()).Payload;
 		if (responseModel is null)
 			return;
@@ -74,6 +74,16 @@ internal class LobbiesWindowViewControl : UIObject
 
 	private async Task JoinLobbyProcedure(int lobbyId)
 	{
-		new ShootingScene().LoadScene();
+		if (!Factories.ClientFactory.Create(out TcpClientHandler client)
+			|| !await client.Connect(IPAddress.Parse(ServerAddresses.GameplayServerAddress), ServerAddresses.GameplayServerPort))
+			return;
+
+		await client.WriteMessage(new MessagePacket<GameplayRequestModel>(MessageType.JoinLobbyRequest, new GameplayRequestModel(SessionHolder.AuthenticationToken) { JoinLobbyId = lobbyId }));
+		MessagePacket<GameplayResponseModel> response = await client.ReadMessage<GameplayResponseModel>();
+
+		if (response.Payload!.SuccessJoiningLobby.HasValue && response.Payload!.SuccessJoiningLobby.Value)
+			new ShootingScene(client).LoadScene();
+		else
+			client.Disconnect();
 	}
 }

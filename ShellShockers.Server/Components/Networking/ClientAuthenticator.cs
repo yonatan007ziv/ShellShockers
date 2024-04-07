@@ -1,5 +1,6 @@
 ﻿
 
+
 namespace ShellShockers.Server.Components.Networking;
 
 internal class ClientAuthenticator
@@ -23,5 +24,10 @@ internal class ClientAuthenticator
 		if (authenticationTokens.ContainsKey(code))
 			return GenerateAuthenticationToken();
 		return code;
+	}
+
+	internal static void AddAuthenticationKey(string authenticationToken, object username)
+	{
+		throw new NotImplementedException();
 	}
 }

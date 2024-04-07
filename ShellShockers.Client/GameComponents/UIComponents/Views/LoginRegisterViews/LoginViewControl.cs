@@ -4,6 +4,7 @@ using ShellShockers.Client.Components;
 using ShellShockers.Client.Components.Networking;
 using ShellShockers.Core.Utilities.InputValidators;
 using ShellShockers.Core.Utilities.Networking.CommunicationProtocols;
+using ShellShockers.Core.Utilities.Networking.CommunicationProtocols.Enums;
 using ShellShockers.Core.Utilities.Networking.CommunicationProtocols.Models;
 using System.Drawing;
 using System.Net;
@@ -20,6 +21,7 @@ internal class LoginViewControl : UIObject
 	public UIButton forgotPasswordButton;
 	private UITextBox usernameTextBox;
 	private UITextBox passwordTextBox;
+	public UILabel resultLabel;
 	private UIButton loginButton;
 
 	public LoginViewControl()
@@ -55,22 +57,19 @@ internal class LoginViewControl : UIObject
 		passwordTextBox.Transform.Position = new Vector3(fieldScale.X + difference, 0.25f, 0);
 		Children.Add(passwordTextBox);
 
+		// Result label
+		resultLabel = new UILabel();
+		resultLabel.Transform.Scale = fieldScale;
+		resultLabel.Transform.Position = new Vector3(0, -0.1f, 0);
+		Children.Add(resultLabel);
+
 		// Login button
 		loginButton = new UIButton();
 		loginButton.TextColor = Color.White;
 		loginButton.Text = "Login";
 		loginButton.Transform.Scale = fieldScale;
-		loginButton.Transform.Position = new Vector3(fieldScale.X + difference, -0.25f, 0);
+		loginButton.Transform.Position = new Vector3(fieldScale.X + difference, -0.45f, 0);
 		Children.Add(loginButton);
-
-		// Forgot password button
-		forgotPasswordButton = new UIButton();
-		forgotPasswordButton.TextColor = Color.White;
-		forgotPasswordButton.Text = "Forgot password?";
-		forgotPasswordButton.TextData.TextColor = Color.White;
-		forgotPasswordButton.Transform.Scale = fieldScale;
-		forgotPasswordButton.Transform.Position = new Vector3(0, -0.75f, 5f);
-		Children.Add(forgotPasswordButton);
 
 		// Switch button
 		switchToRegisterButton = new UIButton();
@@ -78,11 +77,23 @@ internal class LoginViewControl : UIObject
 		switchToRegisterButton.OnFullClicked += () => { ResetTextBoxes(); Visible = false; };
 		switchToRegisterButton.Text = "Register?";
 		switchToRegisterButton.Transform.Scale = fieldScale;
-		switchToRegisterButton.Transform.Position = new Vector3(-(fieldScale.X + difference), -0.25f, 5f);
+		switchToRegisterButton.Transform.Position = new Vector3(-(fieldScale.X + difference), -0.45f, 5f);
 		Children.Add(switchToRegisterButton);
+
+		// Forgot password button
+		forgotPasswordButton = new UIButton();
+		forgotPasswordButton.TextColor = Color.White;
+		forgotPasswordButton.Text = "Forgot password?";
+		forgotPasswordButton.TextData.TextColor = Color.White;
+		forgotPasswordButton.Transform.Scale = fieldScale;
+		forgotPasswordButton.Transform.Position = new Vector3(0, -0.80f, 5f);
+		Children.Add(forgotPasswordButton);
 
 		// Login button clicked
 		loginButton.OnFullClicked += OnLoginButtonClicked;
+
+		usernameTextBox.Text = "yonatan";
+		passwordTextBox.Text = "yonatan";
 	}
 
 	private void ResetTextBoxes()
@@ -102,25 +113,25 @@ internal class LoginViewControl : UIObject
 	{
 		if (!Factories.ClientFactory.Create(out TcpClientHandler clientHandler))
 		{
-			loginButton.Text = "Error creating a TcpClientHandler";
+			resultLabel.Text = "Error creating a TcpClientHandler";
 			return;
 		}
 
 		if (!LoginRegisterInputPredicates.UsernameValid(usernameTextBox.Text))
 		{
-			loginButton.Text = "Invalid username";
+			resultLabel.Text = "Invalid username";
 			return;
 		}
 
 		if (!LoginRegisterInputPredicates.PasswordValid(passwordTextBox.Text))
 		{
-			loginButton.Text = "Invalid password";
+			resultLabel.Text = "Invalid password";
 			return;
 		}
 
 		if (!await clientHandler.Connect(IPAddress.Parse(ServerAddresses.LoginRegisterServerAddress), ServerAddresses.LoginRegisterServerPort))
 		{
-			loginButton.Text = "Error connecting to server";
+			resultLabel.Text = "Error connecting to server";
 			return;
 		}
 
@@ -138,42 +149,35 @@ internal class LoginViewControl : UIObject
 		{
 			switch (response.Payload!.Status)
 			{
-				case Core.Utilities.Networking.CommunicationProtocols.Enums.LoginRegisterResponse.None:
-					loginButton.Text = "Critical: response - None";
+				case LoginRegisterResponse.None:
+					resultLabel.Text = "Critical: response - None";
 					break;
-				case Core.Utilities.Networking.CommunicationProtocols.Enums.LoginRegisterResponse.Success:
-					SuccessfulLogin(response.Payload!.AuthenticationToken);
+				case LoginRegisterResponse.Success:
+					resultLabel.Text = "Success, Confirm not a Robot";
 					break;
-				case Core.Utilities.Networking.CommunicationProtocols.Enums.LoginRegisterResponse.UnknownError:
-					loginButton.Text = "Unknown error occurred";
+				case LoginRegisterResponse.UnknownError:
+					resultLabel.Text = "Unknown error occurred";
 					break;
-				case Core.Utilities.Networking.CommunicationProtocols.Enums.LoginRegisterResponse.UsernameDoesNotExist:
-					loginButton.Text = "Username does not exist";
+				case LoginRegisterResponse.UsernameDoesNotExist:
+					resultLabel.Text = "Username does not exist";
 					break;
-				case Core.Utilities.Networking.CommunicationProtocols.Enums.LoginRegisterResponse.WrongPassword:
-					loginButton.Text = "Wrong password";
+				case LoginRegisterResponse.WrongPassword:
+					resultLabel.Text = "Wrong password";
 					break;
-				case Core.Utilities.Networking.CommunicationProtocols.Enums.LoginRegisterResponse.EmailNotConfirmed:
+				case LoginRegisterResponse.EmailNotConfirmed:
 					OnEmailNotConfirmed?.Invoke();
-					loginButton.Text = "Email not confirmed";
+					resultLabel.Text = "Email not confirmed";
 					break;
 			}
 		}
 
-		// Disconnect at the end of the request
+		if (response.Payload!.Status == LoginRegisterResponse.Success)
+		{
+			SessionHolder.Username = usernameTextBox.Text;
+			Visible = false;
+			OnSuccessfulLogin?.Invoke();
+		}
+
 		clientHandler.Disconnect();
-	}
-
-	private void SuccessfulLogin(string authenticationToken)
-	{
-		OnSuccessfulLogin?.Invoke();
-		AuthenticationTokenHolder.AuthenticationToken = authenticationToken;
-		ResetLoginButtonTextAfterSeconds(5);
-	}
-
-	private async void ResetLoginButtonTextAfterSeconds(int seconds)
-	{
-		await Task.Delay(TimeSpan.FromSeconds(seconds));
-		loginButton.Text = "Login";
 	}
 }

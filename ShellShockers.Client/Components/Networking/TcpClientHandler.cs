@@ -3,7 +3,6 @@ using ShellShockers.Core.Utilities.Exceptions.Encryption;
 using ShellShockers.Core.Utilities.Interfaces;
 using ShellShockers.Core.Utilities.Networking;
 using ShellShockers.Core.Utilities.Networking.CommunicationProtocols;
-using ShellShockers.Core.Utilities.Networking.CommunicationProtocols.Models;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -97,7 +96,6 @@ internal class TcpClientHandler : BaseTcpHandler
 
 	public async void Disconnect()
 	{
-		await WriteMessage(new MessagePacket<EmptyMessageModel>(MessageType.Disconnect, new EmptyMessageModel()));
 		Socket.Close();
 		disconnectedCts.Cancel();
 	}

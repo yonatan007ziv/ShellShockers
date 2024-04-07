@@ -16,5 +16,7 @@ public enum MessageType
 	DoSResponse,
 
 	LobbiesFetchRequest, LobbiesFetchReponse,
+	CreateLobbyRequest, CreateLobbyResponse,
 	JoinLobbyRequest, JoinLobbyResponse,
+	NotARobotRequest, NotARobotResponse,
 }

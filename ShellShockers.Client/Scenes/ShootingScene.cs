@@ -1,6 +1,7 @@
 ﻿using GameEngine.Components;
 using GameEngine.Core.Components;
 using GameEngine.Core.Components.Input.Buttons;
+using ShellShockers.Client.Components.Networking;
 using ShellShockers.Client.GameComponents.WorldComponents.Map;
 using ShellShockers.Client.GameComponents.WorldComponents.Player;
 using System.Numerics;
@@ -9,10 +10,11 @@ namespace ShellShockers.Client.Scenes;
 
 internal class ShootingScene : Scene
 {
+	private readonly TcpClientHandler playerClient;
 	private readonly RotatedCamera rotatingCamera;
 	private bool rotateCamera;
 
-	public ShootingScene()
+	public ShootingScene(TcpClientHandler playerClient)
 	{
 		// Input
 		MapKeyboardAxis("HorizontalMovement", KeyboardButton.D, KeyboardButton.A, 1, 0);
@@ -31,5 +33,6 @@ internal class ShootingScene : Scene
 
 		// Map
 		WorldObjects.Add(new PlayMap());
+		this.playerClient = playerClient;
 	}
 }

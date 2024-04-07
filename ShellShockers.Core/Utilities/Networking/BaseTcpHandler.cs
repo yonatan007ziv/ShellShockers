@@ -39,8 +39,8 @@ public abstract class BaseTcpHandler
 		this.messageSerializer = messageSerializer;
 		this.logger = logger;
 
-		writeTimeout = TimeSpan.FromSeconds(5);
-		readTimeout = TimeSpan.FromSeconds(10);
+		writeTimeout = TimeSpan.FromSeconds(30);
+		readTimeout = TimeSpan.FromSeconds(30);
 
 		encryptionHandler = new EncryptionHandler();
 
@@ -89,7 +89,7 @@ public abstract class BaseTcpHandler
 		catch (ObjectDisposedException ex) { logger.LogError($"Disposed Exception: {ex.Message}"); exceptionType = NetworkedExceptionType.Disposed; }
 		catch (TimeoutException ex) { logger.LogError($"Timeout Exception: {ex.Message}"); exceptionType = NetworkedExceptionType.Timedout; }
 		catch (OperationCanceledException ex) { logger.LogError($"Operation Cancelled Exception: {ex.Message}"); exceptionType = NetworkedExceptionType.OperationCancelled; }
-		catch (Exception ex) { logger.LogCritical("MISHANDLED EXCEPTION: {exceptionMessage}", ex.Message); throw new Exception("UNHANDLED EXCEPTION"); }
+		catch (Exception ex) { logger.LogCritical("MISHANDLED EXCEPTION: {exceptionMessage}", ex.Message); exceptionType = NetworkedExceptionType.Other; }
 
 		disconnectedCts.Cancel();
 		logger.LogError("Error writing message of type: {type}, Error: {errorCode}", typeof(T).Name, exceptionType.ToString());
@@ -129,7 +129,7 @@ public abstract class BaseTcpHandler
 		catch (SerializationException ex) { logger.LogError($"Deserialization Exception: {ex.Message}"); exceptionType = NetworkedExceptionType.DeserializationFailed; }
 		catch (ObjectDisposedException ex) { logger.LogError($"Disposed Exception: {ex.Message}"); exceptionType = NetworkedExceptionType.Disposed; }
 		catch (FormatException ex) { logger.LogError($"Format exception: {ex.Message}"); exceptionType = NetworkedExceptionType.DeserializationFailed; }
-		catch (Exception ex) { logger.LogCritical("MISHANDLED EXCEPTION: {exceptionMessage}", ex.Message); throw new Exception("UNHANDLED EXCEPTION"); }
+		catch (Exception ex) { logger.LogCritical("MISHANDLED EXCEPTION: {exceptionMessage}", ex.Message); exceptionType = NetworkedExceptionType.Other; }
 
 		disconnectedCts.Cancel();
 		logger.LogError("Error reading message of type: {type}, Error: {errorCode}", typeof(T).Name, exceptionType.ToString());
@@ -200,15 +200,4 @@ public abstract class BaseTcpHandler
 
 	public void Disconnected()
 		=> OnDisconnected?.Invoke();
-
-	public void Dispose()
-	{
-		disconnectedCts.Cancel();
-		Socket.Close();
-
-		Socket = new TcpClient();
-		encryptionHandler = new EncryptionHandler();
-		disconnectedCts = new CancellationTokenSource();
-		encryptionTask = new TaskCompletionSource();
-	}
 }

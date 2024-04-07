@@ -10,6 +10,7 @@ internal class LoginRegisterScene : Scene
 	private readonly RegisterViewControl _registerView;
 	private readonly ForgotPasswordViewControl _forgotPasswordView;
 	private readonly Two2FAViewControl _twoFAView;
+	private readonly NotARobotViewControl _notARobotView;
 
 	public LoginRegisterScene()
 	{
@@ -21,7 +22,7 @@ internal class LoginRegisterScene : Scene
 		_loginView.OnEmailNotConfirmed += () => { _loginView.Visible = false; SwitchTo2FA(); };
 		_loginView.switchToRegisterButton.OnFullClicked += SwitchToRegister;
 		_loginView.forgotPasswordButton.OnFullClicked += SwitchToForgotPassword;
-		_loginView.OnSuccessfulLogin += SwitchToMainMenuScene;
+		_loginView.OnSuccessfulLogin += SwitchToNotARobot;
 		UIObjects.Add(_loginView);
 
 		// Register view
@@ -42,6 +43,19 @@ internal class LoginRegisterScene : Scene
 		_twoFAView.switchToLoginButton.OnFullClicked += SwitchToLogin;
 		_twoFAView.Visible = false;
 		UIObjects.Add(_twoFAView);
+
+		// 2FA view
+		_notARobotView = new NotARobotViewControl();
+		_notARobotView.Visible = false;
+		_notARobotView.OnSuccess += SwitchToMainMenuScene;
+		_notARobotView.OnFail += () => { SwitchToLogin(); _loginView.resultLabel.Text = "Bad not a robot, please try again"; };
+		UIObjects.Add(_notARobotView);
+	}
+
+	private void SwitchToNotARobot()
+	{
+		_notARobotView.ResetView();
+		_notARobotView.Visible = true;
 	}
 
 	private void SwitchToMainMenuScene()

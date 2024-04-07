@@ -14,6 +14,8 @@ public class NetworkedException : Exception
 public enum NetworkedExceptionType
 {
 	None,
+	Other,
+
 	IO,
 	Disposed,
 	Timedout,

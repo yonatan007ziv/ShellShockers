@@ -47,7 +47,8 @@ internal class GameplayClientHandler : BaseClientHandler
 		if (message.Type == MessageType.LobbiesFetchRequest)
 			LobbiesFetchRequest();
 		else if (message.Type == MessageType.JoinLobbyRequest)
-			JoinLobbyRequest(message.Payload.JoinLobbyId);
+			if (message.Payload.JoinLobbyId.HasValue)
+				JoinLobbyRequest(message.Payload.JoinLobbyId.Value);
 	}
 
 	private void LobbiesFetchRequest()

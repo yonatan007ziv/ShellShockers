@@ -9,6 +9,8 @@ namespace ShellShockers.Server.Components.Networking.ClientHandlers;
 
 internal class LoginRegisterClientHandler : BaseClientHandler
 {
+	private readonly bool[] notARobotTiles = new bool[9];
+
 	public override async void StartRead()
 	{
 		while (Connected)
@@ -39,6 +41,8 @@ internal class LoginRegisterClientHandler : BaseClientHandler
 			await TwoFARequest(requestModel);
 		else if (message.Type == MessageType.ForgotPasswordRequest)
 			await ForgotPasswordRequestRequest(requestModel);
+		else if (message.Type == MessageType.NotARobotRequest)
+			await NotARobotRequest();
 	}
 
 	private async Task LoginRequest(LoginRegisterRequestModel requestModel)
@@ -60,12 +64,49 @@ internal class LoginRegisterClientHandler : BaseClientHandler
 		else
 		{
 			responseModel.Status = LoginRegisterResponse.Success;
-			responseModel.AuthenticationToken = ClientAuthenticator.GenerateAuthenticationToken();
-
-			ClientAuthenticator.AddAuthenticationKey(responseModel.AuthenticationToken, requestModel.Username);
 		}
 
 		await TcpClientHandler.WriteMessage(responsePacket);
+	}
+
+	private async Task NotARobotRequest()
+	{
+		Random rand = new Random();
+		for (int i = 0; i < notARobotTiles.Length; i++)
+			notARobotTiles[i] = rand.Next(3) == 0;
+		notARobotTiles[4] = true;
+
+		MessagePacket<NotARobotModel> messagePacket = new MessagePacket<NotARobotModel>(MessageType.NotARobotResponse, new NotARobotModel() { SelectedSquares = notARobotTiles });
+		await TcpClientHandler.WriteMessage(messagePacket);
+		try
+		{
+			MessagePacket<NotARobotModel> receivedNotARobot = await TcpClientHandler.ReadMessage<NotARobotModel>();
+			bool[] selectedClientTiles = receivedNotARobot.Payload!.SelectedSquares;
+
+			bool success = true;
+			for (int i = 0; i < selectedClientTiles.Length; i++)
+			{
+				await Console.Out.WriteLineAsync(selectedClientTiles[i].ToString());
+				if (!selectedClientTiles[i])
+					success = false;
+			}
+
+			MessagePacket<NotARobotModel> resultResponse = new MessagePacket<NotARobotModel>(MessageType.NotARobotResponse, new NotARobotModel() { Success = success });
+			if (success)
+			{
+				resultResponse.Payload!.AuthenticationToken = ClientAuthenticator.GenerateAuthenticationToken();
+				ClientAuthenticator.AddAuthenticationKey(resultResponse.Payload!.AuthenticationToken, receivedNotARobot.Payload!.Username);
+
+				await Console.Out.WriteLineAsync(resultResponse.Payload!.AuthenticationToken);
+				await Console.Out.WriteLineAsync(receivedNotARobot.Payload!.Username);
+			}
+			await TcpClientHandler.WriteMessage(resultResponse);
+		}
+		catch
+		{
+			MessagePacket<NotARobotModel> resultResponse = new MessagePacket<NotARobotModel>(MessageType.NotARobotResponse, new NotARobotModel() { Success = false });
+			await TcpClientHandler.WriteMessage(resultResponse);
+		}
 	}
 
 	private async Task RegisterRequest(LoginRegisterRequestModel requestModel)
