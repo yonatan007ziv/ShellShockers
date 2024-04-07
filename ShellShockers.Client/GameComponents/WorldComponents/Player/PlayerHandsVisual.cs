@@ -9,7 +9,7 @@ internal class PlayerHandsVisual : WorldObject
 	private MeshData weaponMeshData;
 
 	public PlayerHandsVisual()
-    {
+	{
 		// Hands
 		Meshes.Add(new MeshData("PlayerEggHand.obj", "Red.mat"));
 	}

@@ -20,9 +20,9 @@ internal class PlayerCameraController : ScriptableWorldObject
 		{
 			Vector2 mouseVector = new Vector2(GetAxis("HorizontalCamera"), GetAxis("VerticalCamera"));
 
-            // Clamp camera
-            float clampedX = Math.Clamp(Parent.Transform.Rotation.X - mouseVector.Y * deltaTime * Sensitivity, -clampAngleX, clampAngleX);
+			// Clamp camera
+			float clampedX = Math.Clamp(Parent.Transform.Rotation.X - mouseVector.Y * deltaTime * Sensitivity, -clampAngleX, clampAngleX);
 			Parent.Transform.Rotation = new Vector3(clampedX, Parent.Transform.Rotation.Y + mouseVector.X * deltaTime * Sensitivity, 0);
 		}
-    }
+	}
 }

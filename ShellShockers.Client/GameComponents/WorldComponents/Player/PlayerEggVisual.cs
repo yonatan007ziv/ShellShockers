@@ -6,7 +6,7 @@ namespace ShellShockers.Client.GameComponents.WorldComponents.Player;
 internal class PlayerEggVisual : WorldObject
 {
 	public PlayerEggVisual()
-    {
+	{
 		// Egg
 		Meshes.Add(new MeshData("PlayerEgg.obj", "White.mat"));
 

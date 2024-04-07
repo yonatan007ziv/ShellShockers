@@ -11,15 +11,15 @@ internal class LobbyHandler
 
 	public readonly LobbyModel lobbyModel;
 
-    public LobbyHandler(LobbyModel lobbyModel)
-    {
+	public LobbyHandler(LobbyModel lobbyModel)
+	{
 		this.lobbyModel = lobbyModel;
-    }
+	}
 
 	public async Task InterpretMessage(MessagePacket<GameplayRequestModel> message)
 	{
-        await Console.Out.WriteLineAsync($"Got a lobby message, lobby id: {lobbyModel.Id}");
-    }
+		await Console.Out.WriteLineAsync($"Got a lobby message, lobby id: {lobbyModel.Id}");
+	}
 
 	public bool LobbyFull()
 		=> players.Count >= lobbyModel.MaxPlayerCount;

@@ -1,7 +1,6 @@
 ﻿using GameEngine.Components;
 using GameEngine.Components.UIComponents;
 using GameEngine.Core.Components;
-using ShellShockers.Core.Utilities.Models;
 
 namespace ShellShockers.Client.Scenes;
 

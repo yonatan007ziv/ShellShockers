@@ -1,8 +1,5 @@
 ﻿using GameEngine.Components;
 using GameEngine.Core.Components;
-using GameEngine.Extensions;
-using System;
-using System.Linq;
 using System.Numerics;
 
 namespace ShellShockers.Client.GameComponents.WorldComponents.Player;
