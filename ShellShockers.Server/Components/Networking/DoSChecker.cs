@@ -3,7 +3,7 @@ using ShellShockers.Core.Utilities.Networking.CommunicationProtocols.Models;
 
 namespace ShellShockers.Server.Components.Networking;
 
-internal class DoSChecker
+internal static class DoSChecker
 {
 	// 10 requests per 5 minutes to the user
 	private const int NumOfAllowedRequests = 10;

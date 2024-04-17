@@ -5,7 +5,7 @@ namespace ShellShockers.Client.GameComponents.WorldComponents.Controllers;
 
 internal class PlayerCameraController : ScriptableWorldObject
 {
-	private float clampAngleX = 45;
+	private float clampAngleX = 80;
 
 	public float Sensitivity { get; set; } = 20;
 

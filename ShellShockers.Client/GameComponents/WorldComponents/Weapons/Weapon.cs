@@ -2,7 +2,7 @@
 
 internal enum Weapon
 {
-	None,
+	Hands,
 	Pistol,
 	Rifle,
 	Sniper,

@@ -1,4 +1,5 @@
-﻿using ShellShockers.Core.Utilities.Models;
+﻿using Microsoft.IdentityModel.Tokens;
+using ShellShockers.Core.Utilities.Models;
 using ShellShockers.Core.Utilities.Networking.CommunicationProtocols;
 using ShellShockers.Core.Utilities.Networking.CommunicationProtocols.Models;
 using ShellShockers.Server.Components.Networking.ClientHandlers;
@@ -8,12 +9,14 @@ namespace ShellShockers.Server.Components.Lobby;
 internal class LobbyHandler
 {
 	private readonly List<GameplayClientHandler> players = new List<GameplayClientHandler>();
+	private readonly GameplayClientHandler host;
 
 	public readonly LobbyModel lobbyModel;
 
-	public LobbyHandler(LobbyModel lobbyModel)
+	public LobbyHandler(LobbyModel lobbyModel, GameplayClientHandler host)
 	{
 		this.lobbyModel = lobbyModel;
+		this.host = host;
 	}
 
 	public async Task InterpretMessage(MessagePacket<GameplayRequestModel> message)

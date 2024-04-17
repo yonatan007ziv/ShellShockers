@@ -47,8 +47,20 @@ internal class GameplayClientHandler : BaseClientHandler
 		if (message.Type == MessageType.LobbiesFetchRequest)
 			LobbiesFetchRequest();
 		else if (message.Type == MessageType.JoinLobbyRequest)
+		{
 			if (message.Payload.JoinLobbyId.HasValue)
 				JoinLobbyRequest(message.Payload.JoinLobbyId.Value);
+		}
+		else if (message.Type == MessageType.CreateLobbyRequest)
+			CreateLobbyRequest(message.Payload.CreateLobbyModel!);
+	}
+
+	private void CreateLobbyRequest(LobbyModel createLobbyModel)
+	{
+        Console.WriteLine($"CREATING LOBBY: {createLobbyModel}");
+
+		bool success = LobbyManager.CreateLobby(createLobbyModel, this);
+		_ = TcpClientHandler.WriteMessage(new MessagePacket<GameplayResponseModel>(MessageType.CreateLobbyResponse, new GameplayResponseModel() { SuccessCreatingLobby = success }));
 	}
 
 	private void LobbiesFetchRequest()

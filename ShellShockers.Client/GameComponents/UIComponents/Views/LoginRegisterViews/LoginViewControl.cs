@@ -91,9 +91,6 @@ internal class LoginViewControl : UIObject
 
 		// Login button clicked
 		loginButton.OnFullClicked += OnLoginButtonClicked;
-
-		usernameTextBox.Text = "yonatan";
-		passwordTextBox.Text = "yonatan";
 	}
 
 	private void ResetTextBoxes()

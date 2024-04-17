@@ -7,4 +7,9 @@ public class LobbyModel
 	public string HostName { get; set; } = "";
 	public int CurrentPlayerCount { get; set; }
 	public int MaxPlayerCount { get; set; }
+
+	public override string ToString()
+	{
+		return $"{Id}: {Name} {HostName} {CurrentPlayerCount}/{MaxPlayerCount}";
+	}
 }

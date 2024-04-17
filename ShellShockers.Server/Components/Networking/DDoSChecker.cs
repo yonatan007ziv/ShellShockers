@@ -1,6 +1,6 @@
 ﻿namespace ShellShockers.Server.Components.Networking;
 
-internal class DDoSChecker
+internal static class DDoSChecker
 {
 	// 50 requests per minute as a whole to the server
 	private const int NumOfAllowedRequests = 50;

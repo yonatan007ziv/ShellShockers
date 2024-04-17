@@ -12,15 +12,28 @@ internal class LobbyManager
 		LobbyModel[] models = new LobbyModel[lobbies.Count];
 		for (int i = 0; i < lobbies.Count; i++)
 			models[i] = lobbies[i].lobbyModel;
+
 		return models;
 	}
 
+	public static bool LobbyIdExists(int id)
+		=> lobbies.ContainsKey(id);
+
 	public static bool AddPlayerToLobby(GameplayClientHandler player, int lobbyId)
 	{
-		if (!lobbies.ContainsKey(lobbyId) || lobbies[lobbyId].LobbyFull())
+		if (!lobbies.TryGetValue(lobbyId, out LobbyHandler? value) || value.LobbyFull())
 			return false;
 
-		lobbies[lobbyId].AddPlayer(player);
+		value.AddPlayer(player);
+		return true;
+	}
+
+	public static bool CreateLobby(LobbyModel createLobbyModel, GameplayClientHandler host)
+	{
+		if (LobbyIdExists(createLobbyModel.Id))
+			return false;
+
+		lobbies.Add(createLobbyModel.Id, new LobbyHandler(createLobbyModel, host));
 		return true;
 	}
 }

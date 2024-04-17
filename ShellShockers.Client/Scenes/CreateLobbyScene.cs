@@ -74,12 +74,12 @@ internal class CreateLobbyScene : Scene
 	private async Task CreateLobbyProcedure()
 	{
 		if (!Factories.ClientFactory.Create(out TcpClientHandler client)
-			|| !await client.Connect(IPAddress.Parse(ServerAddresses.GameplayServerAddress), ServerAddresses.GameplayServerPort)
-			|| !int.TryParse(maxPlayerCountTextBox.Text, out int maxPlayersCount))
+			|| !int.TryParse(maxPlayerCountTextBox.Text, out int maxPlayersCount)
+			|| !await client.Connect(IPAddress.Parse(ServerAddresses.GameplayServerAddress), ServerAddresses.GameplayServerPort))
 			return;
 
-		MessagePacket<GameplayRequestModel> message = new MessagePacket<GameplayRequestModel>(MessageType.JoinLobbyResponse, new GameplayRequestModel(SessionHolder.AuthenticationToken));
-		message.Payload!.CreateLobbyModel = new LobbyModel() { Name = lobbyNameTextBox.Text, MaxPlayerCount = maxPlayersCount };
+		MessagePacket<GameplayRequestModel> message = new MessagePacket<GameplayRequestModel>(MessageType.CreateLobbyRequest, new GameplayRequestModel(SessionHolder.AuthenticationToken));
+		message.Payload!.CreateLobbyModel = new LobbyModel() { HostName = SessionHolder.Username, Name = lobbyNameTextBox.Text, MaxPlayerCount = maxPlayersCount };
 		await client.WriteMessage(message);
 
 		MessagePacket<GameplayResponseModel> response = await client.ReadMessage<GameplayResponseModel>();

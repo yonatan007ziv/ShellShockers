@@ -47,7 +47,7 @@ internal class LoginRegisterScene : Scene
 		// 2FA view
 		_notARobotView = new NotARobotViewControl();
 		_notARobotView.Visible = false;
-		_notARobotView.OnSuccess += SwitchToMainMenuScene;
+		_notARobotView.OnSuccess += OnNotARobotSuccess;
 		_notARobotView.OnFail += () => { SwitchToLogin(); _loginView.resultLabel.Text = "Bad not a robot, please try again"; };
 		UIObjects.Add(_notARobotView);
 	}
@@ -55,10 +55,11 @@ internal class LoginRegisterScene : Scene
 	private void SwitchToNotARobot()
 	{
 		_notARobotView.ResetView();
+		_notARobotView.RequestNotARobotPuzzle();
 		_notARobotView.Visible = true;
 	}
 
-	private void SwitchToMainMenuScene()
+	private void OnNotARobotSuccess()
 	{
 		new MainMenuScene().LoadScene();
 	}

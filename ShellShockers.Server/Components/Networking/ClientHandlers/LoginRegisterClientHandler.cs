@@ -78,6 +78,7 @@ internal class LoginRegisterClientHandler : BaseClientHandler
 
 		MessagePacket<NotARobotModel> messagePacket = new MessagePacket<NotARobotModel>(MessageType.NotARobotResponse, new NotARobotModel() { SelectedSquares = notARobotTiles });
 		await TcpClientHandler.WriteMessage(messagePacket);
+
 		try
 		{
 			MessagePacket<NotARobotModel> receivedNotARobot = await TcpClientHandler.ReadMessage<NotARobotModel>();
@@ -85,20 +86,16 @@ internal class LoginRegisterClientHandler : BaseClientHandler
 
 			bool success = true;
 			for (int i = 0; i < selectedClientTiles.Length; i++)
-			{
-				await Console.Out.WriteLineAsync(selectedClientTiles[i].ToString());
 				if (!selectedClientTiles[i])
 					success = false;
-			}
 
 			MessagePacket<NotARobotModel> resultResponse = new MessagePacket<NotARobotModel>(MessageType.NotARobotResponse, new NotARobotModel() { Success = success });
 			if (success)
 			{
 				resultResponse.Payload!.AuthenticationToken = ClientAuthenticator.GenerateAuthenticationToken();
-				ClientAuthenticator.AddAuthenticationKey(resultResponse.Payload!.AuthenticationToken, receivedNotARobot.Payload!.Username);
 
-				await Console.Out.WriteLineAsync(resultResponse.Payload!.AuthenticationToken);
-				await Console.Out.WriteLineAsync(receivedNotARobot.Payload!.Username);
+                await Console.Out.WriteLineAsync(resultResponse.Payload!.AuthenticationToken);
+                ClientAuthenticator.AddAuthenticationKey(resultResponse.Payload!.AuthenticationToken, receivedNotARobot.Payload!.Username);
 			}
 			await TcpClientHandler.WriteMessage(resultResponse);
 		}

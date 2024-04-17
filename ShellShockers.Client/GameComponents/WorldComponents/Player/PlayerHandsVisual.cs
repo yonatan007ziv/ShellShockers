@@ -18,7 +18,7 @@ internal class PlayerHandsVisual : WorldObject
 	{
 		Meshes.Remove(weaponMeshData);
 
-		if (weapon == Weapon.None)
+		if (weapon == Weapon.Hands)
 			return;
 
 		weaponMeshData = new MeshData($"{weapon}.obj", "Blue.mat");

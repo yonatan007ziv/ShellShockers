@@ -35,11 +35,9 @@ internal class NotARobotViewControl : UIObject
 
 		if (confirmNotARobot is not null)
 			confirmNotARobot.OnFullClicked -= ConfirmNotARobotButton;
-
-		RequestNotARobotPuzzle();
 	}
 
-	private async void RequestNotARobotPuzzle()
+	public async void RequestNotARobotPuzzle()
 	{
 		if (!Factories.ClientFactory.Create(out clientHandler)
 			|| !await clientHandler.Connect(IPAddress.Parse(ServerAddresses.LoginRegisterServerAddress), ServerAddresses.LoginRegisterServerPort))
@@ -103,7 +101,10 @@ internal class NotARobotViewControl : UIObject
 		MessagePacket<NotARobotModel> messageNotARobotMessage = await clientHandler.ReadMessage<NotARobotModel>();
 
 		if (messageNotARobotMessage.Payload!.Success)
+		{
+			SessionHolder.AuthenticationToken = messageNotARobotMessage.Payload.AuthenticationToken;
 			OnSuccess?.Invoke();
+		}
 		else
 			OnFail?.Invoke();
 
